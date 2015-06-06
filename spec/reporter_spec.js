@@ -7,65 +7,18 @@ describe('TerminalReporter', function() {
   });
 
   describe("initialize", function() {
-    it('initializes print_ from config', function() {
-      var config = { print: true };
+    it('initializes some infos from config', function() {
+      var config = {print: true, color: true};
       this.reporter = new jasmineNode.TerminalReporter(config);
       expect(this.reporter.print_).toBeTruthy();
-    });
-
-    it('initializes color_ from config', function() {
-      var config = { color: true }
-      this.reporter = new jasmineNode.TerminalReporter(config);
       expect(this.reporter.color_).toEqual(jasmineNode.TerminalReporter.prototype.ANSIColors);
-    });
-
-    it('initializes includeStackTrace_ from config', function () {
-        var config = {}
-        this.reporter = new jasmineNode.TerminalReporter(config);
-        expect(this.reporter.includeStackTrace_).toBeTruthy();
-    });
-
-    it('sets the started_ flag to false', function() {
-      var config = {}
-      this.reporter = new jasmineNode.TerminalReporter(config);
+      expect(this.reporter.includeStackTrace_).toBeTruthy();
       expect(this.reporter.started_).toBeFalsy();
-    });
-
-    it('sets the finished_ flag to false', function() {
-      var config = {}
-      this.reporter = new jasmineNode.TerminalReporter(config);
       expect(this.reporter.finished_).toBeFalsy();
-    });
-
-    it('initializes the suites_ array', function() {
-      var config = {}
-      this.reporter = new jasmineNode.TerminalReporter(config);
       expect(this.reporter.suites_.length).toEqual(0);
-    });
-
-    it('initializes the specResults_ to an Object', function() {
-      var config = {}
-      this.reporter = new jasmineNode.TerminalReporter(config);
       expect(this.reporter.specResults_).toBeDefined();
-    });
-
-    it('initializes the failures_ array', function() {
-      var config = {}
-      this.reporter = new jasmineNode.TerminalReporter(config);
       expect(this.reporter.failures_.length).toEqual(0);
-    });
-
-    it('sets the callback_ property to false by default', function() {
-      var config = {}
-      this.reporter = new jasmineNode.TerminalReporter(config);
       expect(this.reporter.callback_).toEqual(false)
-    });
-
-    it('sets the callback_ property to onComplete if supplied', function() {
-      var foo = function() { }
-      var config = { onComplete: foo }
-      this.reporter = new jasmineNode.TerminalReporter(config);
-      expect(this.reporter.callback_).toBe(foo)
     });
   });
 
@@ -86,12 +39,6 @@ describe('TerminalReporter', function() {
 
     it('sets the started_ field to true', function() {
       expect(this.reporter.started_).toBeTruthy();
-    });
-
-    it('sets the startedAt field', function() {
-      // instanceof does not work cross-context (such as when run with requirejs)
-      var ts = Object.prototype.toString;
-      expect(ts.call(this.reporter.startedAt)).toBe(ts.call(new Date()));
     });
 
     it('buildes the suites_ collection', function() {
@@ -123,7 +70,7 @@ describe('TerminalReporter', function() {
       var suite = new jasmine.Suite(env, 'suite name', undefined, undefined);
       suite.description = 'the suite';
       suite.parentSuite = null;
-      suite.children_.push(this.spec);
+      suite.children.push(this.spec);
 
       var result = this.reporter.summarize_(suite);
       expect(result.name).toEqual('the suite');
@@ -143,7 +90,7 @@ describe('TerminalReporter', function() {
     it('generates the report', function() {
       var failuresSpy = spyOn(this.reporter, 'reportFailures_');
       var printRunnerResultsSpy = spyOn(this.reporter, 'printRunnerResults_').
-                          andReturn('this is the runner result');
+                          and.returnValue('this is the runner result');
 
       var callbackSpy = spyOn(this.reporter, 'callback_');
 
@@ -306,11 +253,11 @@ describe('TerminalReporter', function() {
                  [ '   Stacktrace:' ] ];
 
       expect(this.printLineSpy).toHaveBeenCalled();
-      expect(this.printLineSpy.argsForCall).toEqual(generatedOutput);
+      expect(this.printLineSpy.calls.allArgs()).toEqual(generatedOutput);
 
       expect(this.printSpy).toHaveBeenCalled();
-      expect(this.printSpy.argsForCall[0]).toEqual(['Failures:']);
-      expect(this.printSpy.argsForCall[1]).toEqual(['     the stackTrace']);
+      expect(this.printSpy.calls.argsFor(0)).toEqual(['Failures:']);
+      expect(this.printSpy.calls.argsFor(1)).toEqual(['     the stackTrace']);
     });
 
     it('prints the failures without a Stacktrace', function () {
@@ -338,16 +285,16 @@ describe('TerminalReporter', function() {
                  [ '     the message' ] ];
 
         expect(this.printLineSpy).toHaveBeenCalled();
-        expect(this.printLineSpy.argsForCall).toEqual(generatedOutput);
+        expect(this.printLineSpy.calls.allArgs()).toEqual(generatedOutput);
 
         expect(this.printSpy).toHaveBeenCalled();
-        expect(this.printSpy.argsForCall[0]).toEqual(['Failures:']);
-        expect(this.printSpy.argsForCall[1]).toBeUndefined();
+        expect(this.printSpy.calls.argsFor(0)).toEqual(['Failures:']);
+        expect(this.printSpy.calls.count()).toEqual(1);
     });
   });
 });
 
-describe('TerminalVerboseReporter', function() {
+xdescribe('TerminalVerboseReporter', function() {
   beforeEach(function() {
     var config = {}
     this.verboseReporter = new jasmineNode.TerminalVerboseReporter(config);
